@@ -360,10 +360,13 @@ class HttpTransport implements TransportInterface
     protected function assembleResult(Query $query, ResponseInterface $response): Result
     {
         $response = $response->getBody()->getContents();
+        
+        // TODO: Handle throwing an exception on error parsing json even though
+        // the response does load from something like:
+        // INSERT INTO <table> SELECT * FROM mysql()
+        $result = json_decode($response, true);
 
         try {
-            $result = \GuzzleHttp\json_decode($response, true);
-
             $statistic = new QueryStatistic(
                 $result['statistics']['rows_read'] ?? 0,
                 $result['statistics']['bytes_read'] ?? 0,
